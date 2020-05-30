@@ -25,6 +25,7 @@ class ControllerBase
   def redirect_to(url)
     raise error if @already_built_response == true
 
+    @session.store_session(@res)
     @res.status = 302
     @res['Location'] = url
     @already_built_response = true
@@ -36,6 +37,7 @@ class ControllerBase
   def render_content(content, content_type)
     raise error if @already_built_response == true
 
+    @session.store_session(@res)
     @res.set_header('Content-Type', content_type)
     @res.write(content)
     @already_built_response = true
@@ -53,7 +55,9 @@ class ControllerBase
   end
 
   # method exposing a `Session` object
-  def session; end
+  def session
+    @session ||= Session.new(@req)
+  end
 
   # use this with the router to call action_name (:index, :show, :create...)
   def invoke_action(name); end
